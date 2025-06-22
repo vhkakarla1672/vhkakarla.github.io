@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Health Revenue Matrix Solutions - Pushing Limits</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;800;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Color Palette & Global Variables */
+        :root {
+            --primary-navy: #0D1B2A; /* Deep, almost black blue */
+            --secondary-blue: #1B263B; /* Slightly lighter dark blue */
+            --accent-aqua: #23A4B0; /* Vibrant, cutting-edge aqua */
+            --highlight-yellow: #FFC300; /* Energetic yellow for key highlights */
+            --bg-light: #F8F9FA; /* Very light, clean background */
+            --text-dark: #333C4E; /* Dark charcoal for body text */
+            --text-light: #E0E1DD; /* Off-white for text on dark backgrounds */
+            --border-subtle: #415A77; /* Muted border for depth */
+
+            /* Shadows & Glassmorphism */
+            --shadow-float: rgba(0, 0, 0, 0.2);
+            --shadow-deep: rgba(0, 0, 0, 0.4);
+            --glass-bg: rgba(255, 255, 255, 0.08); /* For translucent elements */
+            --glass-border: rgba(255, 255, 255, 0.18);
+            --glass-backdrop: blur(10px);
+
+            /* Typography */
+            --font-heading: 'Montserrat', sans-serif;
+            --font-body: 'Poppins', sans-serif;
+
+            --fs-base: 1.1rem;
+            --fs-small: 0.95rem;
+            --fs-h1: 5.5rem; /* Larger, bolder hero */
+            --fs-h1-xl: 7.5rem;
+            --fs-h2: 3.8rem;
+            --fs-h3: 2.8rem;
+            --fs-caption: 2.2rem;
+            --fs-button: 1.4rem;
+
+            /* Spacing & Borders */
+            --spacing-xl: 8rem;
+            --spacing-large: 6rem;
+            --spacing-medium: 3.5rem;
+            --border-radius-hero: 30px;
+            --border-radius-card: 25px;
+            --border-radius-button: 50px;
+        }
+
+        /* Base Styles */
+        body {
+            min-width: 100vw;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-light);
+            font-family: var(--font-body);
+            color: var(--text-dark);
+            line-height: 1.9;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            box-sizing: border-box;
+            padding: 0;
+            perspective: 1000px; /* For 3D transforms */
+        }
+
+        /* --- Global Animations & Effects --- */
+        @keyframes fadeInSlideUp {
+            from { opacity: 0; transform: translateY(50px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        @keyframes heroReveal {
+            0% { opacity: 0; transform: translateY(50px); filter: blur(10px); }
+            100% { opacity: 1; transform: translateY(0); filter: blur(0); }
+        }
+
+        @keyframes waveFloat {
+            0% { transform: translateY(0) translateX(0); }
+            50% { transform: translateY(-10px) translateX(-5px); }
+            100% { transform: translateY(0) translateX(0); }
+        }
+
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 10px rgba(35, 164, 176, 0.5); }
+            50% { box-shadow: 0 0 25px rgba(35, 164, 176, 0.8), 0 0 40px rgba(35, 164, 176, 0.3); }
+            100% { box-shadow: 0 0 10px rgba(35, 164, 176, 0.5); }
+        }
+
+        /* Scroll-triggered animation utility */
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(60px) scale(0.98);
+            transition: opacity 1s cubic-bezier(0.2, 0.8, 0.2, 1), transform 1s cubic-bezier(0.2, 0.8, 0.2, 1);
+            will-change: opacity, transform;
+            filter: blur(5px);
+        }
+        .animate-on-scroll.visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            filter: blur(0);
+        }
+        .animate-on-scroll.staggered-item {
+            transition-delay: var(--delay);
+        }
+
+        /* --- Header / Hero Section --- */
+        header {
+            background: linear-gradient(135deg, var(--primary-navy) 0%, var(--secondary-blue) 100%);
+            color: var(--text-light);
+            padding: var(--spacing-xl) 1rem 6rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            box-sizing: border-box;
+            border-bottom-left-radius: var(--border-radius-hero);
+            border-bottom-right-radius: var(--border-radius-hero);
+            box-shadow: 0 25px 60px var(--shadow-deep);
+            isolation: isolate; /* To ensure z-index of children works against the background */
+        }
+
+        /* Dynamic SVG Background Wave (more complex) */
+        .hero-background-svg {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: auto;
+            z-index: 0;
+            pointer-events: none;
+            filter: drop-shadow(0 -5px 10px rgba(0,0,0,0.2));
+            animation: waveFloat 10s ease-in-out infinite alternate;
+        }
+        .hero-background-svg path {
+            fill: var(--bg-light); /* Match body background */
+        }
+
+        header::before { /* Subtle background pattern */
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px);
+            background-size: 20px 20px;
+            opacity: 0.1;
+            z-index: 1;
+        }
+
+        header h1 {
+            font-family: var(--font-heading);
+            font-size: var(--fs-h1-xl);
+            font-weight: 900;
+            margin: 0;
+            color: var(--text-light);
+            text-shadow: 5px 5px 15px var(--shadow-deep);
+            letter-spacing: -4px;
+            position: relative;
+            z-index: 2;
+            animation: heroReveal 1.8s ease-out forwards;
+        }
+
+        header .caption {
+            font-family: var(--font-heading);
+            font-size: var(--fs-caption);
+            font-weight: 700;
+            color: var(--highlight-yellow);
+            margin-top: 1.5rem;
+            text-shadow: 2px 2px 8px var(--shadow-deep);
+            position: relative;
+            z-index: 2;
+            animation: heroReveal 2s ease-out forwards;
+            animation-delay: 0.2s;
+        }
+
+        header .subtitle {
+            font-size: 1.8rem;
+            margin-top: 1.8rem;
+            color: rgba(255, 255, 255, 0.95);
+            max-width: 1000px;
+            margin-left: auto;
+            margin-right: auto;
+            position: relative;
+            z-index: 2;
+            animation: heroReveal 2.2s ease-out forwards;
+            animation-delay: 0.4s;
+        }
+
+        /* --- Sections --- */
+        section {
+            width: 100%;
+            max-width: 1300px;
+            padding: var(--spacing-medium) 3.5rem;
+            margin-bottom: var(--spacing-medium);
+            box-sizing: border-box;
+            position: relative; /* For parallax children */
+            z-index: 10; /* Ensures content is above hero wave */
+        }
+
+        h2, h3 {
+            font-family: var(--font-heading);
+            color: var(--primary-navy);
+            margin-top: 4rem;
+            margin-bottom: 2rem;
+            font-weight: 900;
+            line-height: 1.3;
+            text-align: center;
+        }
+
+        h2 {
+            font-size: var(--fs-h2);
+            position: relative;
+            display: inline-block;
+            margin-left: auto;
+            margin-right: auto;
+            padding-bottom: 1rem;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.08);
+        }
+        h2::after { /* Dynamic underline effect */
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%) scaleX(0);
+            width: 100px;
+            height: 7px;
+            background-color: var(--accent-aqua);
+            border-radius: 4px;
+            transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        .animate-on-scroll.visible h2::after {
+            transform: translateX(-50%) scaleX(1);
+        }
+
+        h3 {
+            font-size: var(--fs-h3);
+            color: var(--text-dark);
+            text-align: left;
+            margin-top: 3rem;
+            font-weight: 800;
+        }
+
+        p {
+            margin-bottom: 1.5rem;
+            font-size: var(--fs-base);
+        }
+
+        ul, ol {
+            font-size: var(--fs-base);
+            padding-left: 0;
+            margin-top: 1.8rem;
+            list-style: none;
+        }
+
+        li {
+            margin-bottom: 1.2rem;
+            position: relative;
+            padding-left: 45px;
+            display: flex;
+            align-items: flex-start;
+            line-height: 1.7;
+            transition: color 0.3s ease;
+        }
+        li:hover {
+            color: var(--accent-aqua);
+        }
+
+        .custom-bullet-icon {
+            position: absolute;
+            left: 0;
+            top: 6px;
+            width: 28px;
+            height: 28px;
+            fill: var(--highlight-yellow); /* Start with highlight color */
+            transition: fill 0.3s ease, transform 0.3s ease;
+        }
+        li:hover .custom-bullet-icon {
+            fill: var(--accent-aqua); /* Change to accent on hover */
+            transform: scale(1.1);
+        }
+
+        li strong {
+            color: var(--primary-navy);
+            font-weight: 800;
+        }
+
+        .highlight {
+            font-family: var(--font-heading);
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--primary-navy);
+            background: linear-gradient(135deg, #E0EBF7 0%, #D2E0F5 100%);
+            padding: 2rem 3.5rem;
+            border-radius: var(--border-radius-card);
+            margin: 3rem auto;
+            display: block;
+            text-align: center;
+            border-left: 10px solid var(--accent-aqua);
+            box-shadow: 0 12px 30px var(--shadow-float);
+            animation: fadeInSlideUp 0.8s ease-out forwards;
+            animation-delay: 0.5s;
+            position: relative;
+            overflow: hidden;
+            transform: translateZ(0); /* Enable 3D context */
+        }
+        .highlight::before { /* Animated overlay */
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: skewX(-20deg);
+            transition: left 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        .highlight:hover::before {
+            left: 100%;
+        }
+
+        .subtext {
+            font-size: var(--fs-small);
+            color: #6A778C;
+            margin-top: 0.8rem;
+            line-height: 1.6;
+        }
+
+        .why {
+            font-weight: 800;
+            color: var(--highlight-yellow);
+        }
+
+        /* --- Cards & CTAs --- */
+        .card-base {
+            background: #FFFFFF;
+            border-radius: var(--border-radius-card);
+            padding: 3rem;
+            margin: 2.5rem auto;
+            box-shadow: 0 15px 40px var(--shadow-float);
+            transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.5s ease;
+            text-align: center;
+            border: 1px solid var(--border-subtle);
+            position: relative;
+            overflow: hidden;
+            will-change: transform, box-shadow;
+            transform-style: preserve-3d; /* For 3D hover */
+        }
+
+        .card-base::before { /* Dynamic border/glow effect */
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent 0%, rgba(35, 164, 176, 0.08) 50%, transparent 100%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .card-base:hover {
+            transform: translateY(-18px) rotateX(2deg) rotateY(2deg); /* Subtle 3D lift */
+            box-shadow: 0 30px 80px var(--shadow-deep);
+        }
+        .card-base:hover::before {
+            opacity: 1;
+        }
+
+        .cta {
+            max-width: 1000px;
+            padding: 4rem;
+            text-align: center;
+            background: linear-gradient(145deg, var(--secondary-blue) 0%, var(--primary-navy) 100%);
+            color: var(--text-light);
+            box-shadow: 0 20px 50px var(--shadow-deep);
+            border-radius: var(--border-radius-card);
+            border: 1px solid var(--border-subtle);
+            backdrop-filter: var(--glass-backdrop); /* Glassmorphism effect */
+            -webkit-backdrop-filter: var(--glass-backdrop);
+        }
+
+        .cta h3 {
+            color: var(--highlight-yellow);
+            margin-top: 0.8rem;
+            margin-bottom: 2rem;
+            font-weight: 900;
+            font-size: var(--fs-h3);
+            text-align: center;
+        }
+        .cta p {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        /* --- Buttons and Links --- */
+        .button {
+            display: inline-block;
+            font-family: var(--font-heading);
+            font-size: var(--fs-button);
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            border: none;
+            border-radius: var(--border-radius-button);
+            padding: 1.4em 4em;
+            background: linear-gradient(90deg, var(--accent-aqua) 0%, #31D6E2 100%);
+            color: var(--primary-navy); /* Dark text on bright button */
+            transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            text-decoration: none;
+            box-shadow: 0 10px 30px var(--shadow-float);
+            margin-top: 3rem;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            transform: translateZ(0); /* Enable 3D context */
+        }
+
+        .button::before { /* Glare effect */
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -120%;
+            width: 60%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.5);
+            transition: all 0.7s ease-in-out;
+            z-index: -1;
+            transform: skewX(-35deg);
+        }
+
+        .button:hover::before {
+            left: 120%;
+        }
+
+        .button:hover {
+            background: linear-gradient(90deg, #31D6E2 0%, var(--accent-aqua) 100%);
+            transform: translateY(-10px) scale(1.05) rotateZ(0.5deg);
+            box-shadow: 0 20px 50px var(--shadow-deep), 0 0 30px var(--accent-aqua);
+            animation: pulseGlow 2s infinite;
+        }
+
+        .phone-link {
+            font-family: var(--font-heading);
+            font-size: var(--fs-button);
+            font-weight: 700;
+            letter-spacing: 0.8px;
+            color: var(--accent-aqua);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 2.5rem;
+            transition: color 0.4s, transform 0.4s ease;
+            position: relative;
+        }
+        .phone-link::before { /* Underline reveal */
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 3px;
+            background-color: var(--highlight-yellow);
+            transition: width 0.4s ease;
+        }
+        .phone-link:hover::before {
+            width: 100%;
+        }
+        .phone-link:hover {
+            color: var(--highlight-yellow);
+            transform: scale(1.08) translateY(-3px);
+        }
+        .phone-link svg {
+            width: 36px;
+            height: 36px;
+            fill: var(--accent-aqua);
+            transition: fill 0.4s ease;
+        }
+        .phone-link:hover svg {
+            fill: var(--highlight-yellow);
+        }
+
+        a {
+            font-size: var(--fs-base);
+            font-weight: 600;
+            color: var(--accent-aqua);
+            text-decoration: none;
+            position: relative;
+            transition: color 0.3s;
+        }
+        a::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -4px;
+            width: 0%;
+            height: 3px;
+            background-color: var(--highlight-yellow);
+            transition: width 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        a:hover::after {
+            width: 100%;
+        }
+        a:hover {
+            color: var(--highlight-yellow);
+        }
+
+        /* --- Footer --- */
+        .footer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 6rem 1rem 3rem;
+            background: linear-gradient(135deg, var(--primary-navy) 0%, var(--secondary-blue) 100%);
+            border-top-left-radius: var(--border-radius-hero);
+            border-top-right-radius: var(--border-radius-hero);
+            box-shadow: 0 -20px 50px var(--shadow-deep);
+            margin-top: 6rem;
+            width: 100%;
+            box-sizing: border-box;
+            color: var(--text-light);
+            isolation: isolate;
+            position: relative;
+        }
+        .footer::before { /* Subtle background pattern */
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px);
+            background-size: 20px 20px;
+            opacity: 0.1;
+            z-index: 1;
+        }
+
+        .footer-quote {
+            font-family: var(--font-heading);
+            font-size: 1.9rem;
+            font-style: italic;
+            color: var(--text-light);
+            text-align: center;
+            margin: 0 0 4rem 0;
+            padding: 3.5rem 4.5rem;
+            background: var(--glass-bg); /* Glassmorphism card */
+            border: 1px solid var(--glass-border);
+            backdrop-filter: var(--glass-backdrop);
+            -webkit-backdrop-filter: var(--glass-backdrop);
+            border-left: 12px solid var(--accent-aqua);
+            border-radius: var(--border-radius-card);
+            display: flex;
+            align-items: center;
+            gap: 2.2rem;
+            max-width: 1000px;
+            box-shadow: 0 15px 40px var(--shadow-deep);
+            font-weight: 600;
+            text-shadow: 1px 1px 5px rgba(0,0,0,0.4);
+            animation: fadeInSlideUp 1.2s ease-out forwards;
+            position: relative;
+            z-index: 2;
+        }
+
+        .footer-quote span[role="img"] {
+            font-size: 4rem;
+            line-height: 1;
+            color: var(--highlight-yellow);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 30px;
+            margin-top: 3rem;
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .social-links a {
+            display: block;
+            line-height: 0; /* Remove extra space below image */
+            transition: transform 0.3s ease, filter 0.3s ease;
+            filter: grayscale(100%) brightness(1.2); /* Desaturate and brighten by default */
+        }
+
+        .social-links a:hover {
+            transform: translateY(-8px) scale(1.1);
+            filter: grayscale(0%) brightness(1); /* Full color on hover */
+        }
+
+        .social-links img {
+            height: 50px; /* Adjust size as needed */
+            width: auto;
+            border-radius: 8px; /* Slightly rounded corners for logos */
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+
+        .footer-copyright {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.75);
+            font-size: 1.05rem;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* --- Image/Text Sections --- */
+        .content-block {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: var(--spacing-large);
+            margin-top: 4.5rem;
+            margin-bottom: 4.5rem;
+            width: 100%;
+            max-width: 1400px;
+            padding: var(--spacing-medium) 4rem;
+            justify-content: center;
+        }
+        .content-block.reversed {
+            flex-direction: row-reverse;
+        }
+        .content-block .text-half {
+            flex: 1 1 550px;
+            min-width: 320px;
+        }
+        .content-block .image-half {
+            flex: 1 1 500px;
+            min-width: 280px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform-style: preserve-3d;
+        }
+
+        .feature-img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            border-radius: var(--border-radius-card);
+            box-shadow: 0 20px 50px var(--shadow-deep);
+            transition: transform 0.6s ease, box-shadow 0.6s ease;
+            transform: translateZ(0); /* Enable 3D transform */
+        }
+        .feature-img:hover {
+            transform: scale(1.03) translateY(-8px) rotateX(1deg);
+            box-shadow: 0 35px 90px var(--shadow-deep);
+        }
+
+        /* --- Certification Logos --- */
+        .cert-logos-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4.5rem;
+            align-items: center;
+            justify-content: center;
+            margin: 4rem 0;
+            padding: 0 2.5rem;
+        }
+        .cert-logo {
+            height: 120px;
+            width: auto;
+            background: #FFFFFF;
+            border-radius: var(--border-radius-card);
+            box-shadow: 0 10px 30px var(--shadow-float);
+            padding: 1.8rem 3.5rem;
+            transition: transform 0.5s ease, box-shadow 0.5s ease, filter 0.5s ease, opacity 0.5s ease;
+            filter: grayscale(90%) brightness(1.1); /* More desaturated, slightly brighter */
+            opacity: 0.7;
+            transform: translateZ(0);
+        }
+        .cert-logo:hover {
+            transform: translateY(-15px) scale(1.1) rotateZ(-1deg);
+            box-shadow: 0 25px 60px var(--shadow-deep);
+            filter: grayscale(0%) brightness(1); /* Full color on hover */
+            opacity: 1;
+        }
+
+        /* --- "Who Can Join" Cards Grid --- */
+        .who-can-join-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: var(--spacing-medium);
+            margin-top: 3.5rem;
+            margin-bottom: 3.5rem;
+        }
+        .who-can-join-cards .card {
+            padding: 3rem;
+            text-align: left;
+            transition: all 0.5s ease;
+        }
+        .who-can-join-cards .card h3 {
+            color: var(--primary-navy);
+            font-size: 1.7rem;
+            margin-top: 0.8rem;
+            margin-bottom: 1.2rem;
+            text-align: center;
+        }
+        .who-can-join-cards .card p {
+            font-size: var(--fs-small);
+            color: #555;
+        }
+
+        .location-contact {
+            font-size: 1.35rem;
+            font-weight: 600;
+            text-align: center;
+            margin-top: 3rem;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+            letter-spacing: 0.5px;
+        }
+        .closing-message {
+            font-size: 1.25rem;
+            font-weight: 500;
+            color: #6A778C;
+            margin-top: 3rem;
+            text-align: center;
+        }
+        .timing-info {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--accent-aqua);
+            margin-bottom: 1.5rem;
+            text-align: center;
+            letter-spacing: 0.3px;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 1200px) {
+            header h1 { font-size: var(--fs-h1); letter-spacing: -3px; }
+            header .caption { font-size: 2rem; }
+            header .subtitle { font-size: 1.6rem; }
+            h2 { font-size: 3rem; }
+            h3 { font-size: 2.2rem; }
+            .card-base { padding: 2.5rem; }
+            .cert-logo { height: 100px; padding: 1.5rem 3rem; }
+            .content-block { gap: var(--spacing-medium); padding: var(--spacing-medium) 3rem; }
+            .who-can-join-cards { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+            .footer-quote { font-size: 1.7rem; padding: 3rem 4rem; }
+            .social-links img { height: 45px; }
+        }
+
+        @media (max-width: 992px) {
+            header { padding: 6rem 1rem 5rem; border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;}
+            header h1 { font-size: 4rem; letter-spacing: -2px; }
+            header .caption { font-size: 1.7rem; }
+            header .subtitle { font-size: 1.3rem; }
+            h2 { font-size: 2.5rem; }
+            h3 { font-size: 1.9rem; }
+            .content-block { flex-direction: column; gap: 3rem; padding: var(--spacing-medium) 2.5rem; }
+            .content-block.reversed { flex-direction: column; } /* Keep consistent stacking */
+            .content-block .image-half { order: -1; margin-bottom: 2rem; }
+            section { padding: var(--spacing-medium) 2.5rem; }
+            .footer-quote { font-size: 1.5rem; padding: 2.5rem 3rem; gap: 1.5rem; border-left: 10px solid var(--accent-aqua); }
+            .footer-quote span[role="img"] { font-size: 3rem; }
+            .cert-logos-row { gap: 3rem; }
+            .cert-logo { height: 90px; padding: 1.2rem 2.5rem; }
+            .button { padding: 1.1em 3.5em; font-size: 1.2rem; }
+            .who-can-join-cards .card h3 { font-size: 1.6rem; }
+            .phone-link { font-size: 1.2rem; gap: 12px; }
+            .phone-link svg { width: 32px; height: 32px; }
+            .custom-bullet-icon { width: 24px; height: 24px; top: 4px;}
+            li { padding-left: 35px; }
+            .highlight { padding: 1.5rem 2.5rem; }
+            .social-links img { height: 40px; }
+        }
+
+        @media (max-width: 768px) {
+            header { padding: 5rem 0.5rem 4rem; border-bottom-left-radius: 15px; border-bottom-right-radius: 15px;}
+            header h1 { font-size: 3.2rem; }
+            header .caption { font-size: 1.4rem; }
+            header .subtitle { font-size: 1.1rem; }
+            h2 { font-size: 2.2rem; padding-bottom: 0.8rem; }
+            h3 { font-size: 1.7rem; }
+            li { padding-left: 30px; margin-bottom: 1rem; }
+            .custom-bullet-icon { width: 22px; height: 22px; top: 2px; }
+            .card-base { padding: 2rem; font-size: 0.95rem; margin: 2rem auto; }
+            .footer-quote { font-size: 1.3rem; padding: 2rem 2.5rem; gap: 1rem; border-left: 8px solid var(--accent-aqua); }
+            .footer-quote span[role="img"] { font-size: 2.5rem; }
+            .cert-logos-row { gap: 2rem; }
+            .cert-logo { height: 80px; padding: 1rem 2rem; }
+            .who-can-join-cards { grid-template-columns: 1fr; }
+            .button { padding: 1em 3em; font-size: 1.1rem; }
+            .phone-link { font-size: 1.1rem; }
+            .phone-link svg { width: 28px; height: 28px; }
+            .animate-on-scroll { /* Disable animations for very small screens for performance */
+                animation: none !important;
+                transform: none !important;
+                opacity: 1 !important;
+                filter: none !important;
+                transition: none !important;
+            }
+            h2::after { transition: none !important; transform: translateX(-50%) scaleX(1) !important;}
+            .social-links img { height: 35px; }
+        }
+
+        @media (max-width: 480px) {
+            header { padding: 4rem 0.5rem 3rem; }
+            header h1 { font-size: 2.5rem; letter-spacing: -1px; }
+            header .caption { font-size: 1.2rem; }
+            header .subtitle { font-size: 0.95rem; }
+            section { padding: 2rem 1rem; }
+            h2 { font-size: 1.9rem; }
+            h3 { font-size: 1.5rem; }
+            .button { padding: 0.8em 2.5em; font-size: 1rem; }
+            .footer-quote { font-size: 1.1rem; padding: 1.5rem; gap: 0.8rem; }
+            .footer-quote span[role="img"] { font-size: 2rem; }
+            .cert-logo { height: 60px; padding: 0.8rem 1.5rem; }
+            .phone-link { font-size: 1rem; }
+            .phone-link svg { width: 24px; height: 24px; }
+            .highlight { padding: 1.2rem 2rem; }
+            .social-links img { height: 30px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <h1>Health Revenue Matrix Solutions</h1>
+            <div class="caption">Crafting Tomorrow's Healthcare Leaders</div>
+            <p class="subtitle">
+                Unlock Your Potential: Master Medical Coding, RCM & Compliance with Our Industry-Leading Certifications in 2025!
+            </p>
+            <svg class="hero-background-svg" viewBox="0 0 1440 320" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M0,160L48,176C96,192,192,224,288,208C384,192,480,128,576,122.7C672,117,768,171,864,181.3C960,192,1056,155,1152,149.3C1248,144,1344,160,1392,168L1440,176L1440,320L0,320Z"></path>
+            </svg>
+        </header>
+
+        <section class="content-block">
+            <div class="text-half animate-on-scroll">
+                <h2>🎯 Who Are We?</h2>
+                <p>
+                    We’re a premier Healthcare Training & Consulting Firm dedicated to empowering professionals with the skills, certifications, and unwavering support needed to excel in the ever-growing healthcare industry. Our meticulously designed, certification-driven programs and comprehensive job support services are engineered to launch or dramatically elevate your career in:
+                </p>
+                <ul>
+                    <li class="staggered-item" style="--delay: 0.1s;">
+                        <svg class="custom-bullet-icon" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                        Medical Coding: The precision backbone of healthcare finance.
+                    </li>
+                    <li class="staggered-item" style="--delay: 0.2s;">
+                        <svg class="custom-bullet-icon" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                        Revenue Cycle Management (RCM): Optimizing financial health for providers with strategic foresight.
+                    </li>
+                    <li class="staggered-item" style="--delay: 0.3s;">
+                        <svg class="custom-bullet-icon" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                        Medical Auditing: Ensuring unparalleled compliance and data accuracy in all documentation.
+                    </li>
+                    <li class="staggered-item" style="--delay: 0.4s;">
+                        <svg class="custom-bullet-icon" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                        Healthcare Compliance:Expertly navigating the intricate regulatory landscape with confidence.
+                    </li>
+                </ul>
+            </div>
+            <div class="image-half animate-on-scroll">
+                <img src="assets/Students.png" alt="Our Healthcare Students" class="feature-img">
+            </div>
+        </section>
+
+        <section class="animate-on-scroll">
+            <h2>🩺 Why Medical Coding & Revenue Cycle Certifications?</h2>
+            <p>
+                The healthcare landscape is rapidly expanding, and with it, the demand for certified professionals who can accurately code, bill, and manage health records. This isn't just a job; it's a future-proof career rich with opportunity. Here's why these certifications are your next strategic move:
+            </p>
+            <ul>
+                <li class="staggered-item" style="--delay: 0.1s;">
+                    <svg class="custom-bullet-icon" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                    Higher Earning Potential: Command a premium salary with industry-recognized certifications that validate your expertise.
+                </li>
+                <li class="staggered-item" style="--delay: 0.2s;">
+                    <svg class="custom-bullet-icon" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                    Abundant Job Opportunities: Access an expansive network of roles in leading hospitals, major payers, dynamic insurers, and high-demand consulting firms.
+                </li>
+                <li class="staggered-item" style="--delay: 0.3s;">
+                    <svg class="custom-bullet-icon" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                    Remote-Friendly Roles: Enjoy unprecedented work-from-home flexibility, a defining hallmark of modern healthcare careers.
+                </li>
+                <li class="staggered-item" style="--delay: 0.4s;">
+                    <svg class="custom-bullet-icon" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                    Clear Career Advancement: These certifications serve as direct steppingstones to senior Health Information Management (HIM), Compliance, and Medical Auditing roles, propelling your professional growth.
+                </li>
+            </ul>
+        </section>
+
+        <section class="content-block reversed">
+            <div class="text-half animate-on-scroll">
+                <h2>📘 What Is Medical Coding?</h2>
+                <p>
+                    Medical Coding is the critical process of translating intricate clinical diagnoses and procedures into standardized alphanumeric codes (ICD-10-CM, CPT, HCPCS, DRG). These codes are the universal language of healthcare, absolutely vital for:
+                </p>
+                <ul>
+                    <li class="staggered-item" style="--delay: 0.1s;">
+                        <svg class="custom-bullet-icon" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                        Seamless Insurance Claim Processing: Ensuring prompt, precise, and compliant submission of claims.
+                    </li>
+                    <li class="staggered-item" style="--delay: 0.2s;">
+                        <svg class="custom-bullet-icon" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                        Optimized Provider Reimbursement: Maximizing financial recovery for healthcare services rendered.
+                    </li>
+                    <li class="staggered-item" style="--delay: 0.3s;">
+                        <svg class="custom-bullet-icon" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                        Rigorous Regulatory Reporting: Meeting all federal, state, and industry-specific compliance mandates with integrity.
+                    </li>
+                    <li class="staggered-item" style="--delay: 0.4s;">
+                        <svg class="custom-bullet-icon" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                        Insightful Data Analytics & Compliance: Driving informed strategic decisions and maintaining impeccable legal and ethical integrity.
+                    </li>
+                </ul>
+                <div class="highlight animate-on-scroll">
+                    🎯 Accurate coding = fewer denials + faster payments + robust legal protection!
+                </div>
+            </div>
+            <div class="image-half animate-on-scroll">
+                <img src="assets/MedicalCoding.png" alt="Medical Coding Concepts" class="feature-img">
+            </div>
+        </section>
+
+        <section class="animate-on-scroll">
+            <h2>🎓 What Are These Certification Programs?</h2>
+            <p>
+                We don't just offer training; we offer gateways to elite expertise. Our programs prepare you for top-tier, globally recognized certifications that validate your skills and dramatically boost your employability:
+            </p>
+            <div class="certification-grid">
+                <ul>
+                    <li class="staggered-item" style="--delay: 0.1s;">
+                        <svg class="custom-bullet-icon" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                        <strong>🔹 HFMA Certification</strong>
+                        <ul>
+                            <li>
+                                <strong>CRCR (Certified Revenue Cycle Representative):</strong> Your pathway to mastering the entire end-to-end revenue cycle – from patient registration to final collections and compliance. Ideal for RCM specialists, billing professionals, and hospital revenue staff.
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="staggered-item" style="--delay: 0.2s;">
+                        <svg class="custom-bullet-icon" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                        <strong>🔹 AAPC Certifications</strong>
+                        <ul>
+                            <li><strong>CPC (Certified Professional Coder):</strong> The unequivocal gold standard for physician coding in outpatient settings.</li>
+                            <li><strong>COC (Certified Outpatient Coder):</strong> Specialized expertise for coding complex hospital outpatient services.</li>
+                            <li><strong>CIC (Certified Inpatient Coder):</strong> Dive deep into inpatient hospital coding with unparalleled ICD-10-PCS and MS-DRG mastery.</li>
+                            <li><strong>CPMA (Certified Professional Medical Auditor):</strong> Become an expert in compliance and medical audits, safeguarding healthcare integrity and financial accuracy.</li>
+                        </ul>
+                    </li>
+                    <li class="staggered-item" style="--delay: 0.3s;">
+                        <svg class="custom-bullet-icon" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                        <strong>🔹 AHIMA Certifications</strong>
+                        <ul>
+                            <li>
+                                <strong>CCS (Certified Coding Specialist):</strong> A highly respected certification recognized for both inpatient and outpatient coding, seamlessly integrating both CPT and ICD-10 skills for comprehensive expertise.
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <div class="cert-logos-row animate-on-scroll">
+                <img src="assets/AAPC.WEBP" alt="AAPC Logo" class="cert-logo staggered-item" style="--delay: 0.1s;">
+                <img src="assets/AHIMA.WEBP" alt="AHIMA Logo" class="cert-logo staggered-item" style="--delay: 0.2s;">
+                <img src="assets/HFMA.png" alt="HFMA Logo" class="cert-logo staggered-item" style="--delay: 0.3s;">
+            </div>
+        </section>
+
+        <section class="animate-on-scroll">
+            <h2>📚 Core Skills You’ll Master</h2>
+            <p>Our curriculum is meticulously designed to equip you with the essential, high-demand skills that healthcare employers demand. You'll gain practical, real-world expertise in:</p>
+            <ul>
+                <li class="staggered-item" style="--delay: 0.1s;">
+                    <svg class="custom-bullet-icon" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                    <strong>✅ Medical Terminology & Anatomy:</strong>
+                    <p class="subtext">
+                        The absolute foundation of accurate coding. You'll master the specialized language of healthcare and the intricate structures of the human body, enabling precise understanding of clinical documentation.
+                        <br><span class="why">🔍 Why it's important:</span> Crucial for comprehending clinical documentation and assigning precise codes, minimizing errors and ensuring patient safety.
+                    </p>
+                </li>
+                <li class="staggered-item" style="--delay: 0.2s;">
+                    <svg class="custom-bullet-icon" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                    <strong>✅ ICD-10-CM, ICD-10-PCS, CPT, HCPCS Level II Coding Systems:</strong>
+                    <ul>
+                        <li><strong>ICD-10-CM:</strong> Master coding for all diagnoses and health conditions across every healthcare setting.</li>
+                        <li><strong>ICD-10-PCS:</b> Specialize in the precise coding of complex inpatient hospital procedures.</li>
+                        <li><strong>CPT:</strong> Accurately represent medical, surgical, and diagnostic services primarily in outpatient and physician settings.</li>
+                        <li><strong>HCPCS Level II:</strong> Code for non-physician services including durable medical equipment (DME), ambulance services, prosthetics, and specific medications.</li>
+                    </ul>
+                    <p class="subtext">
+                        <span class="why">🔍 Why it's important:</span> Unwavering mastery of these critical, industry-standard coding systems is the cornerstone of accurate coding and efficient, compliant billing.
+                    </p>
+                </li>
+                <li class="staggered-item" style="--delay: 0.3s;">
+                    <svg class="custom-bullet-icon" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                    <strong>✅ Inpatient/Outpatient Billing Guidelines:</strong>
+                    <p class="subtext">
+                        Deeply understand the nuanced differences between services provided when a patient is formally admitted to a hospital (inpatient) versus care received without admission (outpatient).
+                        <br><span class="why">🔍 Why it's important:</span> Distinct billing rules apply depending on the care setting; strict adherence to these guidelines is paramount for accurate and compliant claims processing.
+                    </p>
+                </li>
+                <li class="staggered-item" style="--delay: 0.4s;">
+                    <svg class="custom-bullet-icon" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                    <strong>✅ E/M Coding, Modifiers, and Audit Preparation:</strong>
+                    <p class="subtext">
+                        Learn to precisely document and code physician-patient interactions (Evaluation and Management - E/M codes), skillfully utilize two-character modifiers to provide critical granular detail, and expertly prepare for rigorous coding audits.
+                        <br><span class="why">🔍 Why it's important:</span> Expertise in E/M coding and modifiers directly impacts reimbursement rates and ensures impeccable audit readiness, protecting revenue and compliance.
+                    </p>
+                </li>
+                <li class="staggered-item" style="--delay: 0.5s;">
+                    <svg class="custom-bullet-icon" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                    <strong>✅ HIPAA & HITECH Compliance Regulations:</strong>
+                    <p class="subtext">
+                        HIPAA (Health Insurance Portability and Accountability Act): The bedrock for protecting sensitive patient health information (PHI).<br>
+                        HITECH (Health Information Technology for Economic and Clinical Health Act): Fortifies HIPAA by vigorously promoting the secure adoption of electronic health records (EHRs) and enhancing security protections.
+                        <br><span class="why">🔍 Why it's important:</span> A profound understanding of HIPAA and HITECH is indispensable for legally, ethically, and securely handling all health information, preventing costly breaches.
+                    </p>
+                </li>
+                <li class="staggered-item" style="--delay: 0.6s;">
+                    <svg class="custom-bullet-icon" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                    <strong>✅ RCM Workflow & Healthcare Reimbursement Systems:</strong>
+                    <p class="subtext">
+                        Trace the entire patient care episode from initial registration through to final payment within the Revenue Cycle Management (RCM) framework, and comprehensively grasp how providers are reimbursed by insurers.
+                        <br><span class="why">🔍 Why it's important:</span> As a certified coder, you play a pivotal and strategic role in the revenue cycle by translating clinical services into accurately reimbursable codes, directly impacting financial health.
+                    </p>
+                </li>
+                <li class="staggered-item" style="--delay: 0.7s;">
+                    <svg class="custom-bullet-icon" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                    <strong>✅ Practice Exams & Mock Interviews:</strong>
+                    <p class="subtext">
+                        Our comprehensive practice exams meticulously simulate the real certification test environments, while personalized mock interviews hone your confidence and equip you to ace job interviews with compelling responses.
+                        <br><span class="why">🔍 Why it's important:</span> These indispensable tools guarantee your exam success and job-readiness through hands-on preparation, targeted feedback, and real-world simulation.
+                    </p>
+                </li>
+            </ul>
+        </section>
+
+        <section class="animate-on-scroll">
+            <h2>🌎 Who Can Join?</h2>
+            <p>Our programs are meticulously designed for a diverse range of ambitious individuals ready to make their indelible mark in the dynamic world of healthcare:</p>
+            <div class="who-can-join-cards">
+                <div class="card card-base animate-on-scroll staggered-item" style="--delay: 0.1s;">
+                    <h3>RCM/Medical Billing Professionals</h3>
+                    <p>Elevate your existing profile and credentials to unlock advanced roles, command higher earning potential, and specialize further within the revenue cycle.</p>
+                </div>
+                <div class="card card-base animate-on-scroll staggered-item" style="--delay: 0.2s;">
+                    <h3>Clinical & IT Professionals</h3>
+                    <p>Seamlessly pivot your expertise into high-demand Health Information Management (HIM) or crucial healthcare compliance roles, leveraging your existing foundational knowledge.</p>
+                </div>
+                <div class="card card-base animate-on-scroll staggered-item" style="--delay: 0.3s;">
+                    <h3>International Medical Graduates (IMGs)</h3>
+                    <p>Discover fulfilling and impactful non-clinical US healthcare careers that strategically leverage your extensive medical knowledge and passion for the field.</p>
+                </div>
+                <div class="card card-base animate-on-scroll staggered-item" style="--delay: 0.4s;">
+                    <h3>Career Switchers</h3>
+                    <p>From any professional background, confidently target remote, recession-proof, and in-demand healthcare roles with our expert guidance and structured pathways to success.</p>
+                </div>
+            </div>
+            <p class="location-contact">
+                <strong>📍 Location:</strong> 100% Online – Join from Anywhere in the world! Our virtual classroom brings expertise to your doorstep.
+            </p>
+            <p class="location-contact">
+                <strong>📞 Ready to Transform Your Career? Call/WhatsApp Us Now:</strong>
+                <a href="tel:+12038951532" class="phone-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.15 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.46.57 3.57.11.35.03.76-.24 1.03l-2.2 2.2z"/></svg>
+                    +1 (203) 895-1532
+                </a>
+            </p>
+        </section>
+
+        <div class="content-block animate-on-scroll">
+            <div class="image-half">
+                <img src="assets/Price.png" alt="Course Pricing Details" class="feature-img">
+            </div>
+        </div>
+
+        <section class="cta animate-on-scroll">
+            <p class="timing-info">🕒 Flexible Timings | Engaging Live Sessions Available</p>
+            <h3>🔥 Your Future in Healthcare Starts Here!</h3>
+            <p>
+                Don't just dream of a rewarding healthcare career in 2025 – actively build it! Join our expert-led, immersive training programs, become globally certified by industry leaders, and confidently step into the dynamic and indispensable world of Medical Coding, Revenue Cycle Management, and Healthcare Compliance.
+            </p>
+            <p>
+                Seats are highly limited – Secure your spot today to guarantee your place in our next cohort!
+            </p>
+            <a href="https://wa.me/12038951532" target="_blank" class="button">Enroll Now via WhatsApp</a>
+            <p class="closing-message">
+                Let’s collaborate to turn your professional aspirations into a tangible and successful reality. 🚀
+            </p>
+        </section>
+
+        <footer class="footer">
+            <blockquote class="footer-quote animate-on-scroll">
+                <span role="img" aria-label="sparkle">✨</span>
+                "Welcome to healthcare! Get ready to grow, learn, and become an indispensable expert in this vital and ever-evolving field – your journey to impact starts now."
+                <span role="img" aria-label="health">🩺</span>
+            </blockquote>
+            <div class="social-links animate-on-scroll">
+                <a href="https://www.thinkers360.com/tl/profiles/view/31119" target="_blank" aria-label="Thinkers360 Profile">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSfI3iB1m0S6O9r0R-M2f4D-J3k-c5G6u2o0g&s" alt="Thinkers360 Logo">
+                </a>
+                <a href="https://www.linkedin.com/in/venkata-hemanth-k-15000555/" target="_blank" aria-label="LinkedIn Profile">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/LinkedIn_logo_initials.png/480px-LinkedIn_logo_initials.png" alt="LinkedIn Logo">
+                </a>
+            </div>
+            <p class="footer-copyright">
+                © <span id="year"></span> Health Revenue Matrix Solutions. All rights reserved.
+            </p>
+        </footer>
+    </div>
+    <script>
+        // Set current year dynamically
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        // Intersection Observer for scroll-triggered animations
+        const observerOptions = {
+            root: null, // viewport
+            rootMargin: '0px',
+            threshold: 0.1 // When 10% of the element is visible
+        };
+
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    // Staggered animation for lists
+                    if (entry.target.tagName === 'UL' || entry.target.tagName === 'OL' || entry.target.classList.contains('who-can-join-cards') || entry.target.classList.contains('cert-logos-row')) {
+                        Array.from(entry.target.children).forEach((child, index) => {
+                            if (child.classList.contains('staggered-item')) {
+                                child.style.transitionDelay = `${index * 0.1}s`;
+                                child.classList.add('visible');
+                            }
+                        });
+                    }
+                    observer.unobserve(entry.target); // Stop observing once visible
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.animate-on-scroll').forEach(element => {
+            observer.observe(element);
+        });
+
+        // Parallax effect (more advanced, requires active listening)
+        // This is a simplified example. For true parallax, you'd calculate
+        // scroll position relative to elements and apply transform: translateY()
+        // or background-position based on a multiplier.
+        // For production, consider a dedicated parallax library.
+
+        // Example for header parallax (simplified)
+        window.addEventListener('scroll', () => {
+            const scrollY = window.scrollY;
+            const header = document.querySelector('header');
+            const heroSVG = document.querySelector('.hero-background-svg');
+            const speed = 0.3; // Adjust for desired parallax effect
+
+            if (header) {
+                // Apply a slight translateY to the header content
+                header.style.transform = `translateY(${scrollY * speed * 0.5}px)`;
+            }
+            if (heroSVG) {
+                // Apply a different translateY to the SVG for a layered effect
+                heroSVG.style.transform = `translateY(${scrollY * speed * 1.5}px)`;
+            }
+        });
+    </script>
+</body>
+</html>
